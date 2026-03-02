@@ -1,0 +1,21 @@
+name: Workflow Dev
+
+on:
+  pull_request:
+    branches:
+      ['main', 'dev', 'test']
+
+jobs:
+  continuous-integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.x
+      - name: run install dev and test
+        run: |
+          npm install
+          npm run dev
+          npm run test
