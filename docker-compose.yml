@@ -1,10 +1,11 @@
 services:
-  mysql-db:
-    image: mysql:8.0
-    container_name: jailtracker-mysql
+  postgres-db:
+    image: postgres:15
+    container_name: jailtracker-postgres
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: jailtracker
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: jailtracker
     ports:
-      - "3306:3306"
+      - "5432:5432"
