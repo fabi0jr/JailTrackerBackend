@@ -2,10 +2,12 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt'
 import { LoginDto } from './dto/login.dto';
+import { JwtService } from '@nestjs/jwt';
+import { access } from 'fs';
 
 @Injectable()
 export class AuthService {
-    constructor(private readonly prisma: PrismaService) {}
+    constructor(private readonly prisma: PrismaService, private jwtService: JwtService) {}
 
     async login (logindto: LoginDto) {
         const user = await this.prisma.db.user.findUnique({
@@ -17,6 +19,10 @@ export class AuthService {
         const isPasswordValid = await bcrypt.compare(logindto.senha, user.senha)
         if (!isPasswordValid) { throw new UnauthorizedException('Email ou senha incorreta') }
 
-        return { message: "Login efetuado com sucesso! Pronto para gerar o Token." };
+        const payload = { sub: user.id, email: user.email };
+
+        return { 
+            access_token: await this.jwtService.signAsync(payload),
+         };
   }
 }

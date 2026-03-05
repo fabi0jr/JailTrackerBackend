@@ -16,6 +16,7 @@ async function bootstrap() {
   });
 
   const config = new DocumentBuilder()
+    .addBearerAuth()
     .setTitle('JailTracker API')
     .setDescription('API for the JailTracker project')
     .setVersion('1.0')
