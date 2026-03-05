@@ -1,8 +1,9 @@
-import { Controller, Post, Get, Body, UseGuards } from '@nestjs/common';
+import { Controller, Post, Get, Body, UseGuards, Req } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth} from '@nestjs/swagger';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UsersService } from './users.service';
 import { AuthGuard } from '@nestjs/passport';
+import { Request } from 'express';
 
 @ApiTags('Usuários')
 @Controller('users')
@@ -18,8 +19,9 @@ export class UsersController {
     @UseGuards(AuthGuard('jwt'))
     @ApiBearerAuth()
     @Get()
-    findAll() {
-        return "Token valido"
+    findAll(@Req() request: Request & { user: { userId: number; email: string } }) {
+        const usuarioLogado = request.user;
+        return `Você está logado! Seu ID é ${usuarioLogado.userId} e seu email é ${usuarioLogado.email}`;
     }
 
 
