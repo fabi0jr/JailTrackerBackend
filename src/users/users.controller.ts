@@ -1,9 +1,10 @@
-import { Controller, Post, Get, Body, UseGuards, Req } from '@nestjs/common';
+import { Controller, Post, Get, Body, UseGuards, Req, ParseIntPipe, Param, Patch, Delete} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth} from '@nestjs/swagger';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UsersService } from './users.service';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @ApiTags('Usuários')
 @Controller('users')
@@ -19,9 +20,38 @@ export class UsersController {
     @UseGuards(AuthGuard('jwt'))
     @ApiBearerAuth()
     @Get()
-    findAll(@Req() request: Request & { user: { userId: number; email: string } }) {
-        const usuarioLogado = request.user;
-        return `Você está logado! Seu ID é ${usuarioLogado.userId} e seu email é ${usuarioLogado.email}`;
+    @ApiOperation({ summary: 'Find All' })
+    findAll() {
+        return this.usersService.findAll()
+    }
+
+    @UseGuards(AuthGuard('jwt'))
+    @ApiBearerAuth()
+    @Get(':id')
+    @ApiOperation({ summary: 'Find One by ID' })
+    findOne(@Param('id', ParseIntPipe) id: number) {
+        return this.usersService.findOne(id)
+    }
+
+    @UseGuards(AuthGuard('jwt'))
+    @ApiBearerAuth()
+    @Patch(':id')
+    @ApiOperation({ summary: 'Update user data' })
+    update(
+        @Param('id', ParseIntPipe) id: number,
+        @Body() updateUserDto: UpdateUserDto
+    ) {
+        return this.usersService.update(id, updateUserDto)
+    }
+
+    @UseGuards(AuthGuard('jwt'))
+    @ApiBearerAuth()
+    @Delete(':id')
+    @ApiOperation({ summary: 'Delete user' })
+    remove(
+        @Param('id', ParseIntPipe) id: number,
+    ) {
+        return this.usersService.remove(id)
     }
 
 
