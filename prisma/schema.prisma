@@ -22,4 +22,30 @@ model User {
   telefone String
   endereco String
 
+  prisoners Prisoner[]
+
+}
+
+model Prisoner {
+
+  id Int @id @default(autoincrement())
+  nome String
+  estadoCivil String
+  nomePai String
+  nomeMae String
+  cpf String @unique
+  delito String
+  reicidencia Boolean @default(false)
+  dataNasc DateTime
+  pavilhao String
+  cela String
+
+  foto String?
+
+  criadorId Int
+  criador User @relation(fields: [criadorId], references: [id])
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
 }
