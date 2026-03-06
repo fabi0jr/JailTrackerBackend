@@ -45,6 +45,14 @@ export class UsersService {
     }
 
     async findOne(id: number) {
+        const userExist = await this.prisma.db.user.findUnique({
+            where: { id: id }
+        })
+
+        if (!userExist) {
+            throw new NotFoundException('User não Encontrado')
+        }
+        
         const user = await this.prisma.db.user.findUnique({
             where: { id: id },
             select: {
@@ -59,6 +67,14 @@ export class UsersService {
     }
 
     async update(id: number, updateUserDto: UpdateUserDto) {
+        const userExists = await this.prisma.db.user.findUnique({
+            where: { id: id },
+        })
+
+        if (!userExists) {
+            throw new NotFoundException('Usuário não encontrado');
+        }
+        
         if (updateUserDto.senha) {
             updateUserDto.senha = await bcrypt.hash(updateUserDto.senha, 10)
         }
@@ -78,6 +94,14 @@ export class UsersService {
     }
 
     async remove(id: number) {
+        const userExist = await this.prisma.db.user.findUnique({
+            where: { id: id }
+        })
+
+        if (!userExist) {
+            throw new NotFoundException('User não Encontrado')
+        }
+
         await this.prisma.db.user.delete({
             where: { id: id },
         })
