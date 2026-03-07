@@ -23,6 +23,8 @@ model User {
   endereco String
 
   prisoners Prisoner[]
+  visitors Visitor[]
+  visits Visit[]
 
 }
 
@@ -48,4 +50,42 @@ model Prisoner {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  visits Visit[]
+
+}
+
+model Visitor {
+
+  id Int @id @default(autoincrement())
+  nome String
+  cpf String @unique
+  telefone String
+
+  criadorId Int
+  criador User @relation(fields: [criadorId], references: [id])
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  visits Visit[]
+
+}
+
+model Visit {
+  id Int @id @default(autoincrement())
+  dataVisita DateTime
+  horaEntrada String
+  horaSaida String
+
+  visitorId Int
+  visitor Visitor @relation(fields: [visitorId], references: [id])
+
+  prisonerId Int
+  prisoner Prisoner @relation(fields: [prisonerId], references: [id])
+  
+  criadorId Int
+  criador User @relation(fields: [criadorId], references: [id])
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

@@ -1,4 +1,4 @@
-import { BadGatewayException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadGatewayException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreatePrisonerDto } from './dto/create-prisoner.dto';
 import { UpdatePrisonerDto } from './dto/update-prisoner.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -12,7 +12,7 @@ export class PrisonersService {
       where: { cpf: createPrisonerDto.cpf },
     })
     if (userExists) {
-      throw new BadGatewayException('Este CPF ja esta em uso');
+      throw new ConflictException('Este CPF ja esta em uso');
     }
 
     const newPrisoner = await this.prisma.db.prisoner.create({

@@ -6,7 +6,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
 import { UpdateUserDto } from './dto/update-user.dto';
 
-@ApiTags('Usuários')
+@ApiTags('Users')
 @Controller('users')
 export class UsersController {
     constructor(private readonly usersService: UsersService) {}
