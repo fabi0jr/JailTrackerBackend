@@ -27,6 +27,7 @@ export class AuthController {
                 { secret: process.env.JWT_SECRET, expiresIn: '15m' }
             );
 
+            console.log('Novo access token gerado:', process.env.JWT_SECRET);
             return {
                 access_token: newAccessToken,
             };
