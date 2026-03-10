@@ -31,7 +31,7 @@ export class AuthService {
         })
 
         return {
-            acess_token: accessToken,
+            access_token: accessToken,
             refresh_token: refreshToken,
         }
     }
