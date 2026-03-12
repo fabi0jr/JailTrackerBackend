@@ -1,34 +1,26 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntPipe } from '@nestjs/common';
 import { MovimentacoesService } from './movimentacoes.service';
 import { CreateMovimentacoeDto } from './dto/create-movimentacoe.dto';
 import { UpdateMovimentacoeDto } from './dto/update-movimentacoe.dto';
+import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
 
+@ApiTags('movimentacoes')
 @Controller('movimentacoes')
+@UseGuards(AuthGuard('jwt'))
+@ApiBearerAuth()
 export class MovimentacoesController {
   constructor(private readonly movimentacoesService: MovimentacoesService) {}
 
-  @Post()
-  create(@Body() createMovimentacoeDto: CreateMovimentacoeDto) {
-    return this.movimentacoesService.create(createMovimentacoeDto);
-  }
-
   @Get()
+  @ApiOperation({ summary: 'Listar todo o historico de movimentações (Geral)' })
   findAll() {
     return this.movimentacoesService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.movimentacoesService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateMovimentacoeDto: UpdateMovimentacoeDto) {
-    return this.movimentacoesService.update(+id, updateMovimentacoeDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.movimentacoesService.remove(+id);
+  @Get('prisoner/:prisonerId')
+  @ApiOperation({ summary: 'Buscar historico de um preso específico' })
+  findByPrisoner(@Param('prisonerId', ParseIntPipe) prisonerId: number) {
+    return this.movimentacoesService.findByPrisoner(prisonerId);
   }
 }

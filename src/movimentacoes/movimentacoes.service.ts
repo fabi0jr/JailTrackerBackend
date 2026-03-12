@@ -1,26 +1,27 @@
 import { Injectable } from '@nestjs/common';
-import { CreateMovimentacoeDto } from './dto/create-movimentacoe.dto';
-import { UpdateMovimentacoeDto } from './dto/update-movimentacoe.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class MovimentacoesService {
-  create(createMovimentacoeDto: CreateMovimentacoeDto) {
-    return 'This action adds a new movimentacoe';
+  constructor (private readonly prisma: PrismaService){}
+
+  async findAll() {
+    return this.prisma.db.movimentacao.findMany({
+      orderBy: { dataMovimentacao: 'desc' },
+      include: {
+        prisoner: { select:{ nome: true, cpf: true } },
+        criador: { select:{ nome: true } },
+      }
+  })
   }
 
-  findAll() {
-    return `This action returns all movimentacoes`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} movimentacoe`;
-  }
-
-  update(id: number, updateMovimentacoeDto: UpdateMovimentacoeDto) {
-    return `This action updates a #${id} movimentacoe`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} movimentacoe`;
+  async findByPrisoner(prisonerId: number) {
+    return this.prisma.db.movimentacao.findMany({
+      where: { prisonerId: prisonerId },
+      orderBy: { dataMovimentacao: 'desc' },
+      include: {
+        criador: { select: { nome: true } }
+      }
+    })
   }
 }
