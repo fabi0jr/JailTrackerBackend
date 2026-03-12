@@ -1,9 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, ParseIntPipe } from '@nestjs/common';
 import { PrisonersService } from './prisoners.service';
 import { CreatePrisonerDto } from './dto/create-prisoner.dto';
 import { UpdatePrisonerDto } from './dto/update-prisoner.dto';
 import { ApiTags, ApiOperation, ApiBearerAuth} from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import { monitorEventLoopDelay } from 'perf_hooks';
+import { SolitariaDto } from './dto/solitaria.dto';
 
 @Controller('prisoners')
 @UseGuards(AuthGuard('jwt'))
@@ -37,8 +39,13 @@ export class PrisonersController {
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update prisioner data' })
-  update(@Param('id') id: string, @Body() updatePrisonerDto: UpdatePrisonerDto) {
-    return this.prisonersService.update(+id, updatePrisonerDto);
+  update(
+    @Param('id') id: string, 
+    @Body() updatePrisonerDto: UpdatePrisonerDto,
+    @Req() request: any
+  ) {
+    const userId = request.user.userId;
+    return this.prisonersService.update(+id, updatePrisonerDto, userId);
   }
 
   @Delete(':id')
@@ -46,4 +53,19 @@ export class PrisonersController {
   remove(@Param('id') id: string) {
     return this.prisonersService.remove(+id);
   }
+
+  @Post(':id/solitaria')
+  @ApiOperation({ summary: 'Enviar preso para solitária' })
+  enviarParaSolitaria(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() solitariaDto: SolitariaDto,
+    @Req() request: any,
+  ){
+    const userId = request.user.userId
+    const dataFimConvertida = new Date(solitariaDto.dataFim)
+
+    return this.prisonersService.enviarParaSolitaria(id, solitariaDto.motivo, dataFimConvertida, userId)
+
+  }
+
 }
