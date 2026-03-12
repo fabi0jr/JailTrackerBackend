@@ -31,6 +31,12 @@ export class PrisonersController {
     return this.prisonersService.findAll();
   }
 
+  @Get('solitaria')
+  @ApiOperation({ summary: 'Listar todos os presos em solitária' })
+  findAllSolitaria() {
+    return this.prisonersService.findAllSolitaria()
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Find One by ID' })
   findOne(@Param('id') id: string) {
@@ -67,5 +73,4 @@ export class PrisonersController {
     return this.prisonersService.enviarParaSolitaria(id, solitariaDto.motivo, dataFimConvertida, userId)
 
   }
-
 }

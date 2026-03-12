@@ -39,9 +39,7 @@ export class PrisonersService {
       throw new NotFoundException('Preso não encontrado')
     }
     
-    return this.prisma.db.prisoner.findUnique({
-      where: { id },
-    })
+    return prisonerExists;
   }
 
   async update(id: number, updatePrisonerDto: UpdatePrisonerDto, userId: number) {
@@ -122,6 +120,16 @@ export class PrisonersService {
   })
 
   return updatePrisoner
+
+  }
+
+  async findAllSolitaria() {
+    
+    const prisoners = await this.prisma.db.prisoner.findMany({
+      where: { naSolitaria: true },
+    })
+
+    return prisoners
 
   }
 
