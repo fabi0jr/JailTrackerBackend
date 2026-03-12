@@ -83,6 +83,8 @@ model Visit {
   horaEntrada String
   horaSaida String
 
+  status Boolean @default(false)
+
   visitorId Int
   visitor Visitor @relation(fields: [visitorId], references: [id])
 

@@ -2,10 +2,28 @@ import { ConflictException, Injectable, NotFoundException } from '@nestjs/common
 import { CreateVisitDto } from './dto/create-visit.dto';
 import { UpdateVisitDto } from './dto/update-visit.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Injectable()
 export class VisitsService {
   constructor(private readonly prisma: PrismaService) {}
+
+  @Cron(CronExpression.EVERY_MINUTE)
+  async checkVisit(){
+    const hoje = new Date()
+
+    await this.prisma.db.visit.updateMany({
+      where: {
+        dataVisita: {
+          lt: hoje,
+        },
+        status: false,
+      },
+      data: {
+        status: true,
+      },
+    })
+  }
 
   async create(createVisitDto: CreateVisitDto, userId: any) {
     const { visitorId, prisonerId, ...visitData } = createVisitDto;
@@ -40,6 +58,7 @@ export class VisitsService {
 
   async findAll() {
     return this.prisma.db.visit.findMany({
+      orderBy: { dataVisita: 'desc' },
       include: {
         visitor: true,
         prisoner: true,
