@@ -8,14 +8,18 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 export class VisitsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  @Cron(CronExpression.EVERY_MINUTE)
+  @Cron(CronExpression.EVERY_HOUR)
   async checkVisit(){
     const hoje = new Date()
+    const horario = `${hoje.getHours().toString().padStart(2, '0')}:00`
 
     await this.prisma.db.visit.updateMany({
       where: {
         dataVisita: {
           lt: hoje,
+        },
+        horaSaida: {
+          lte: horario,
         },
         status: false,
       },
