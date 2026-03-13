@@ -133,4 +133,14 @@ export class PrisonersService {
 
   }
 
+  async ocupationRate() {
+    const pavilhao = await this.prisma.db.prisoner.groupBy({
+      by: ['pavilhao'],
+      _count: {
+        id: true
+      }
+    })
+    return pavilhao
+  }
+
 }

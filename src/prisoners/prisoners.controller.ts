@@ -13,6 +13,12 @@ import { SolitariaDto } from './dto/solitaria.dto';
 export class PrisonersController {
   constructor(private readonly prisonersService: PrisonersService) {}
   
+  @Get('ocupation-pavilhao')
+  @ApiOperation({ summary: 'Taxa de ocupação' })
+  ocupationRate() {
+    return this.prisonersService.ocupationRate()
+  }
+
   @Post()
   @ApiOperation({ summary: 'Cria um novo preso' })
   create(
