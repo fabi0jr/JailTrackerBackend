@@ -11,17 +11,20 @@ export class VisitsService {
   @Cron(CronExpression.EVERY_HOUR)
   async checkVisit(){
     const hoje = new Date()
-    const horario = `${hoje.getHours().toString().padStart(2, '0')}:00`
+    hoje.setUTCHours(0,0,0,0)
+    const horaAtualObj = new Date();
+    const horarioAtualStr = `${horaAtualObj.getHours().toString().padStart(2, '0')}:${horaAtualObj.getMinutes().toString().padStart(2, '0')}`;
 
     await this.prisma.db.visit.updateMany({
       where: {
-        dataVisita: {
-          lt: hoje,
-        },
-        horaSaida: {
-          lte: horario,
-        },
         status: false,
+        OR: [
+          { dataVisita: { lt:hoje } },
+          { 
+            dataVisita: { equals:hoje }, 
+            horaSaida: { lt: horarioAtualStr } 
+          }
+        ]
       },
       data: {
         status: true,
