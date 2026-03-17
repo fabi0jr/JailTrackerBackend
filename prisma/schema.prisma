@@ -26,6 +26,7 @@ model User {
   prisoners Prisoner[]
   visitors Visitor[]
   visits Visit[]
+  relacoesCriadas RelacaoVisitantePreso[]
 
 }
 
@@ -57,6 +58,7 @@ model Prisoner {
   updatedAt   DateTime @updatedAt
 
   visits Visit[]
+  visitantes RelacaoVisitantePreso[]
 
 }
 
@@ -74,6 +76,7 @@ model Visitor {
   updatedAt   DateTime @updatedAt
 
   visits Visit[]
+  relacoes RelacaoVisitantePreso[]
 
 }
 
@@ -109,4 +112,24 @@ model Movimentacao {
 
   criadorId Int
   criador User @relation(fields: [criadorId], references: [id])
+}
+
+model RelacaoVisitantePreso {
+  id Int @id @default(autoincrement())
+
+  tipoRelacao String
+
+  visitorId Int
+  visitor Visitor @relation(fields: [visitorId], references: [id])
+
+  prisonerId Int
+  prisoner Prisoner @relation(fields: [prisonerId], references: [id])
+
+  criadorId Int
+  criador User @relation(fields: [criadorId], references: [id])
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([visitorId, prisonerId])
 }

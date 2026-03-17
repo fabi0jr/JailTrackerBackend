@@ -38,6 +38,19 @@ export class VisitsService {
     const visitorInfo = await this.prisma.db.visitor.findUnique({
       where: { id: visitorId },
     });
+    
+    const temVinculo = await this.prisma.db.relacaoVisitantePreso.findUnique({
+      where: {
+        visitorId_prisonerId: {
+          visitorId: visitorId,
+          prisonerId: prisonerId,
+        }
+      }
+    })
+
+    if (!temVinculo) {
+      throw new NotFoundException('Visitante não tem vinculo com o preso');
+    }
 
     if (!visitorInfo) {
       throw new NotFoundException('Visitante não encontrado');

@@ -16,6 +16,7 @@ import { UpdateVisitorDto } from './dto/update-visitor.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
+import { VincularPresoDto } from './dto/vincular-preso.dto';
 
 interface AuthenticatedRequest extends Request {
   user: {
@@ -30,6 +31,22 @@ interface AuthenticatedRequest extends Request {
 @ApiBearerAuth()
 export class VisitorsController {
   constructor(private readonly visitorsService: VisitorsService) {}
+
+  @Post(':id/vincular-preso')
+  @ApiOperation({ summary: 'Vincular um visitante a um preso'})
+  vincularPreso(
+    @Param('id', ParseIntPipe) visitorId: number,
+    @Body() vincularPresoDto: VincularPresoDto,
+    @Req() request: AuthenticatedRequest
+  ) {
+    const userId = request.user.userId;
+    return this.visitorsService.vincularPreso(
+      visitorId,
+      vincularPresoDto.prisonerId,
+      vincularPresoDto.tipoRelacao,
+      userId
+    );
+  }
 
   @Post()
   @ApiOperation({ summary: 'Cria um novo visitante' })
