@@ -9,3 +9,19 @@ services:
       POSTGRES_DB: jailtracker
     ports:
       - "5432:5432"
+
+  minio:
+    image: minio/minio:latest
+    container_name: jailtracker-minio
+    ports:
+      - "9000:9000" # Porta da API (A que o NestJS vai usar)
+      - "9001:9001" # Porta do Painel de Controlo (Para você ver no navegador)
+    environment:
+      MINIO_ROOT_USER: "jailtracker_admin"
+      MINIO_ROOT_PASSWORD: "jailtracker_password_123"
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+
+volumes:
+  minio_data:

@@ -1,9 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, UseInterceptors, ParseIntPipe, UploadedFile, BadRequestException } from '@nestjs/common';
 import { PrisonersService } from './prisoners.service';
 import { CreatePrisonerDto } from './dto/create-prisoner.dto';
 import { UpdatePrisonerDto } from './dto/update-prisoner.dto';
-import { ApiTags, ApiOperation, ApiBearerAuth} from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBearerAuth, ApiConsumes, ApiBody} from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('prisoners')
 @UseGuards(AuthGuard('jwt'))
@@ -11,6 +12,27 @@ import { AuthGuard } from '@nestjs/passport';
 export class PrisonersController {
   constructor(private readonly prisonersService: PrisonersService) {}
   
+
+  @Post(':id/foto')
+  @ApiOperation({ summary: 'Fazer upload da foto do preso' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        foto: { type: 'string', format: 'binary' },
+      },
+    },
+  })
+  @UseInterceptors(FileInterceptor('foto'))
+  uploadFoto(
+    @Param('id', ParseIntPipe) id: number,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    if (!file) throw new BadRequestException('Nenhum arquivo enviado');
+    return this.prisonersService.uploadProfileImage(id, file);
+  }
+
   @Post()
   @ApiOperation({ summary: 'Cria um novo preso' })
   create(

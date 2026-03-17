@@ -2,10 +2,11 @@ import { BadGatewayException, ConflictException, Injectable, NotFoundException }
 import { CreatePrisonerDto } from './dto/create-prisoner.dto';
 import { UpdatePrisonerDto } from './dto/update-prisoner.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { UploadsService } from 'src/uploads/uploads.service';
 
 @Injectable()
 export class PrisonersService {
-  constructor(private readonly prisma: PrismaService){}
+  constructor(private readonly prisma: PrismaService, private readonly uploadsService: UploadsService){}
   
   async create(createPrisonerDto: CreatePrisonerDto, userId: number) {
     const userExists = await this.prisma.db.prisoner.findUnique({
@@ -73,5 +74,24 @@ export class PrisonersService {
       where: { id: id },
     })
     return { message: 'Preso deletado com sucesso!' }
+  }
+
+  async uploadProfileImage(id: number, file: Express.Multer.File) {
+    const prisonerExists = await this.prisma.db.prisoner.findUnique({
+      where: { id: id },
+    })
+
+    if (!prisonerExists) {
+      throw new NotFoundException('Preso não encontrado');
+    }
+
+    const imageUrl = await this.uploadsService.uploadFile(file);
+
+    const updatedPrisoner = await this.prisma.db.prisoner.update({
+      where: { id },
+      data: { foto: imageUrl },
+    });
+
+    return updatedPrisoner;
   }
 }
