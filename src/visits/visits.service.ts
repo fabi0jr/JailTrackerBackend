@@ -1,4 +1,8 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateVisitDto } from './dto/create-visit.dto';
 import { UpdateVisitDto } from './dto/update-visit.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -9,9 +13,9 @@ export class VisitsService {
   constructor(private readonly prisma: PrismaService) {}
 
   @Cron(CronExpression.EVERY_HOUR)
-  async checkVisit(){
-    const hoje = new Date()
-    hoje.setUTCHours(0,0,0,0)
+  async checkVisit() {
+    const hoje = new Date();
+    hoje.setUTCHours(0, 0, 0, 0);
     const horaAtualObj = new Date();
     const horarioAtualStr = `${horaAtualObj.getHours().toString().padStart(2, '0')}:${horaAtualObj.getMinutes().toString().padStart(2, '0')}`;
 
@@ -19,17 +23,17 @@ export class VisitsService {
       where: {
         status: false,
         OR: [
-          { dataVisita: { lt:hoje } },
-          { 
-            dataVisita: { equals:hoje }, 
-            horaSaida: { lt: horarioAtualStr } 
-          }
-        ]
+          { dataVisita: { lt: hoje } },
+          {
+            dataVisita: { equals: hoje },
+            horaSaida: { lt: horarioAtualStr },
+          },
+        ],
       },
       data: {
         status: true,
       },
-    })
+    });
   }
 
   async create(createVisitDto: CreateVisitDto, userId: any) {
@@ -69,8 +73,8 @@ export class VisitsService {
       include: {
         visitor: true,
         prisoner: true,
-        criador: {select: {nome: true}},
-      }
+        criador: { select: { nome: true } },
+      },
     });
   }
 

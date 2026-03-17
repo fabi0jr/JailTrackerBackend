@@ -1,4 +1,9 @@
-import { BadGatewayException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadGatewayException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreatePrisonerDto } from './dto/create-prisoner.dto';
 import { UpdatePrisonerDto } from './dto/update-prisoner.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -6,54 +11,63 @@ import { UploadsService } from 'src/uploads/uploads.service';
 
 @Injectable()
 export class PrisonersService {
-  constructor(private readonly prisma: PrismaService, private readonly uploadsService: UploadsService){}
-  
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly uploadsService: UploadsService,
+  ) {}
+
   async create(createPrisonerDto: CreatePrisonerDto, userId: number) {
     const userExists = await this.prisma.db.prisoner.findUnique({
       where: { cpf: createPrisonerDto.cpf },
-    })
+    });
     if (userExists) {
       throw new ConflictException('Este CPF ja esta em uso');
     }
 
     const newPrisoner = await this.prisma.db.prisoner.create({
       data: {
-        ...createPrisonerDto,   
+        ...createPrisonerDto,
         criadorId: userId,
-      }
-    })
+      },
+    });
 
     return newPrisoner;
-
   }
 
   async findAll() {
-    return this.prisma.db.prisoner.findMany()
+    return this.prisma.db.prisoner.findMany();
   }
 
   async findOne(id: number) {
     const prisonerExists = await this.prisma.db.prisoner.findUnique({
-      where: { id: id }
-    })
-
-    if (!prisonerExists) {
-      throw new NotFoundException('Preso não encontrado')
-    }
-    
-    return prisonerExists;
-  }
-
-  async update(id: number, updatePrisonerDto: UpdatePrisonerDto, userId: number) {
-    const prisonerExists = await this.prisma.db.prisoner.findUnique({
       where: { id: id },
-    })
+    });
 
     if (!prisonerExists) {
       throw new NotFoundException('Preso não encontrado');
     }
 
-    const mudouCela = updatePrisonerDto.cela &&  updatePrisonerDto.cela !== prisonerExists.cela;
-    const mudouPavilhao = updatePrisonerDto.pavilhao && updatePrisonerDto.pavilhao !== prisonerExists.pavilhao;
+    return prisonerExists;
+  }
+
+  async update(
+    id: number,
+    updatePrisonerDto: UpdatePrisonerDto,
+    userId: number,
+  ) {
+    const prisonerExists = await this.prisma.db.prisoner.findUnique({
+      where: { id: id },
+    });
+
+    if (!prisonerExists) {
+      throw new NotFoundException('Preso não encontrado');
+    }
+
+    const mudouCela =
+      updatePrisonerDto.cela && updatePrisonerDto.cela !== prisonerExists.cela;
+    const mudouPavilhao =
+      updatePrisonerDto.pavilhao &&
+      updatePrisonerDto.pavilhao !== prisonerExists.pavilhao;
 
     const updatedPrisoner = await this.prisma.db.prisoner.update({
       where: { id },
@@ -61,7 +75,8 @@ export class PrisonersService {
     });
 
     if (mudouCela || mudouPavilhao) {
-      const destinoPavilhao = updatePrisonerDto.pavilhao || prisonerExists.pavilhao;
+      const destinoPavilhao =
+        updatePrisonerDto.pavilhao || prisonerExists.pavilhao;
       const destinoCela = updatePrisonerDto.cela || prisonerExists.cela;
 
       await this.prisma.db.movimentacao.create({
@@ -70,8 +85,8 @@ export class PrisonersService {
           descricao: `Transferência de [${prisonerExists.pavilhao} - ${prisonerExists.cela}] para [${destinoPavilhao} - ${destinoCela}]`,
           prisonerId: id,
           criadorId: userId,
-        }
-      })
+        },
+      });
     }
 
     return updatedPrisoner;
@@ -79,22 +94,22 @@ export class PrisonersService {
 
   async remove(id: number) {
     const prisonerExists = await this.prisma.db.prisoner.findUnique({
-      where: { id: id }
-    })
+      where: { id: id },
+    });
 
     if (!prisonerExists) {
-      throw new NotFoundException('Preso não encontrado')
+      throw new NotFoundException('Preso não encontrado');
     }
     await this.prisma.db.prisoner.delete({
       where: { id: id },
-    })
-    return { message: 'Preso deletado com sucesso!' }
+    });
+    return { message: 'Preso deletado com sucesso!' };
   }
 
   async uploadProfileImage(id: number, file: Express.Multer.File) {
     const prisonerExists = await this.prisma.db.prisoner.findUnique({
       where: { id: id },
-    })
+    });
 
     if (!prisonerExists) {
       throw new NotFoundException('Preso não encontrado');
@@ -110,25 +125,30 @@ export class PrisonersService {
     return updatedPrisoner;
   }
 
-  async enviarParaSolitaria(id: number, motivo: string, dataFim: Date, userId: number) {
+  async enviarParaSolitaria(
+    id: number,
+    motivo: string,
+    dataFim: Date,
+    userId: number,
+  ) {
     const prisoner = await this.prisma.db.prisoner.findUnique({
-      where: { id: id }
-    })
+      where: { id: id },
+    });
 
     if (!prisoner) {
-      throw new NotFoundException('Preso não encontrado')
+      throw new NotFoundException('Preso não encontrado');
     }
-    if (prisoner.naSolitaria){
-      throw new ConflictException('Preso ja esta em solitária')
+    if (prisoner.naSolitaria) {
+      throw new ConflictException('Preso ja esta em solitária');
     }
 
     const updatePrisoner = await this.prisma.db.prisoner.update({
       where: { id },
       data: {
         naSolitaria: true,
-        dataFimSolitaria: dataFim
-      }
-    })
+        dataFimSolitaria: dataFim,
+      },
+    });
 
     await this.prisma.db.movimentacao.create({
       data: {
@@ -136,30 +156,27 @@ export class PrisonersService {
         descricao: `Enviado para a solitária. Motivo: ${motivo}. Previsão de saída: ${dataFim.toLocaleDateString('pt-BR', { timeZone: 'UTC' })}`,
         prisonerId: id,
         criadorId: userId,
-      }
-    })
+      },
+    });
 
-    return updatePrisoner
-
+    return updatePrisoner;
   }
 
   async findAllSolitaria() {
-    
     const prisoners = await this.prisma.db.prisoner.findMany({
       where: { naSolitaria: true },
-    })
+    });
 
-    return prisoners
-
+    return prisoners;
   }
 
   async ocupationRate() {
     const pavilhao = await this.prisma.db.prisoner.groupBy({
       by: ['pavilhao'],
       _count: {
-        id: true
-      }
-    })
-    return pavilhao
+        id: true,
+      },
+    });
+    return pavilhao;
   }
 }

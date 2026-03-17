@@ -10,7 +10,7 @@ async function bootstrap() {
     origin: [
       'http://localhost:5173',
       'https://jail-tracker-frontend-dev.vercel.app',
-      'https://jail-tracker-frontend-test.vercel.app'
+      'https://jail-tracker-frontend-test.vercel.app',
     ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
@@ -26,9 +26,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
   await app.listen(process.env.PORT ?? 3000);
-
 }
 bootstrap();

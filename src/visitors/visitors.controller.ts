@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, ParseIntPipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Req,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { VisitorsService } from './visitors.service';
 import { CreateVisitorDto } from './dto/create-visitor.dto';
 import { UpdateVisitorDto } from './dto/update-visitor.dto';
@@ -33,7 +44,10 @@ export class VisitorsController {
 
   @Patch(':id')
   @ApiOperation({ summary: 'Atualiza um visitante por ID' })
-  update(@Param('id', ParseIntPipe) id: number, @Body() updateVisitorDto: UpdateVisitorDto) {
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateVisitorDto: UpdateVisitorDto,
+  ) {
     return this.visitorsService.update(id, updateVisitorDto);
   }
 

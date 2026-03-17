@@ -3,16 +3,16 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class MovimentacoesService {
-  constructor (private readonly prisma: PrismaService){}
+  constructor(private readonly prisma: PrismaService) {}
 
   async findAll() {
     return this.prisma.db.movimentacao.findMany({
       orderBy: { dataMovimentacao: 'desc' },
       include: {
-        prisoner: { select:{ nome: true, cpf: true } },
-        criador: { select:{ nome: true } },
-      }
-  })
+        prisoner: { select: { nome: true, cpf: true } },
+        criador: { select: { nome: true } },
+      },
+    });
   }
 
   async findByPrisoner(prisonerId: number) {
@@ -20,8 +20,8 @@ export class MovimentacoesService {
       where: { prisonerId: prisonerId },
       orderBy: { dataMovimentacao: 'desc' },
       include: {
-        criador: { select: { nome: true } }
-      }
-    })
+        criador: { select: { nome: true } },
+      },
+    });
   }
 }
