@@ -14,7 +14,15 @@ import { VisitsService } from './visits.service';
 import { CreateVisitDto } from './dto/create-visit.dto';
 import { UpdateVisitDto } from './dto/update-visit.dto';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
+import { Request } from 'express';
+
+interface AuthenticatedRequest extends Request {
+  user: {
+    userId: number;
+    email: string;
+  };
+}
 
 @Controller('visits')
 @UseGuards(AuthGuard('jwt'))
@@ -24,7 +32,10 @@ export class VisitsController {
 
   @Post()
   @ApiOperation({ summary: 'Criar um novo registro de visita' })
-  create(@Body() createVisitDto: CreateVisitDto, @Req() request: any) {
+  create(
+    @Body() createVisitDto: CreateVisitDto,
+    @Req() request: AuthenticatedRequest,
+  ) {
     const userId = request.user.userId;
     return this.visitsService.create(createVisitDto, userId);
   }

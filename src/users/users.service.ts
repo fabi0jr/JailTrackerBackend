@@ -30,7 +30,7 @@ export class UsersService {
         senha: hashedPassword,
       },
     });
-    const { senha, ...userSemSenha } = newUser;
+    const { senha: _senha, ...userSemSenha } = newUser;
     return userSemSenha;
   }
 

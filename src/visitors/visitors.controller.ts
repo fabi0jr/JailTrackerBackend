@@ -15,6 +15,14 @@ import { CreateVisitorDto } from './dto/create-visitor.dto';
 import { UpdateVisitorDto } from './dto/update-visitor.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Request } from 'express';
+
+interface AuthenticatedRequest extends Request {
+  user: {
+    userId: number;
+    email: string;
+  };
+}
 
 @ApiTags('visitors')
 @Controller('visitors')
@@ -25,7 +33,10 @@ export class VisitorsController {
 
   @Post()
   @ApiOperation({ summary: 'Cria um novo visitante' })
-  create(@Body() createVisitorDto: CreateVisitorDto, @Req() request: any) {
+  create(
+    @Body() createVisitorDto: CreateVisitorDto,
+    @Req() request: AuthenticatedRequest,
+  ) {
     const userId = request.user.userId;
     return this.visitorsService.create(createVisitorDto, userId);
   }

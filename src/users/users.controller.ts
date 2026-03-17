@@ -4,7 +4,6 @@ import {
   Get,
   Body,
   UseGuards,
-  Req,
   ParseIntPipe,
   Param,
   Patch,
@@ -14,7 +13,6 @@ import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UsersService } from './users.service';
 import { AuthGuard } from '@nestjs/passport';
-import { Request } from 'express';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 @ApiTags('Users')

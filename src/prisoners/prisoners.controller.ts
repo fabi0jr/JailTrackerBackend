@@ -26,6 +26,14 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { SolitariaDto } from './dto/solitaria.dto';
+import { Request } from 'express';
+
+interface AuthenticatedRequest extends Request {
+  user: {
+    userId: number;
+    email: string;
+  };
+}
 
 @Controller('prisoners')
 @UseGuards(AuthGuard('jwt'))
@@ -62,7 +70,10 @@ export class PrisonersController {
 
   @Post()
   @ApiOperation({ summary: 'Cria um novo preso' })
-  create(@Body() createPrisonerDto: CreatePrisonerDto, @Req() request: any) {
+  create(
+    @Body() createPrisonerDto: CreatePrisonerDto,
+    @Req() request: AuthenticatedRequest,
+  ) {
     const userId = request.user.userId;
 
     return this.prisonersService.create(createPrisonerDto, userId);
@@ -91,7 +102,7 @@ export class PrisonersController {
   update(
     @Param('id') id: string,
     @Body() updatePrisonerDto: UpdatePrisonerDto,
-    @Req() request: any,
+    @Req() request: AuthenticatedRequest,
   ) {
     const userId = request.user.userId;
     return this.prisonersService.update(+id, updatePrisonerDto, userId);
@@ -108,7 +119,7 @@ export class PrisonersController {
   enviarParaSolitaria(
     @Param('id', ParseIntPipe) id: number,
     @Body() solitariaDto: SolitariaDto,
-    @Req() request: any,
+    @Req() request: AuthenticatedRequest,
   ) {
     const userId = request.user.userId;
     const dataFimConvertida = new Date(solitariaDto.dataFim);

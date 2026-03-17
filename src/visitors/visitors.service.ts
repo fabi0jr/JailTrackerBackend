@@ -11,7 +11,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class VisitorsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(createVisitorDto: CreateVisitorDto, userId: any) {
+  async create(createVisitorDto: CreateVisitorDto, userId: number) {
     const visitorExists = await this.prisma.db.visitor.findUnique({
       where: { cpf: createVisitorDto.cpf },
     });

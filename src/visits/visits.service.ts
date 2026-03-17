@@ -1,8 +1,4 @@
-import {
-  ConflictException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateVisitDto } from './dto/create-visit.dto';
 import { UpdateVisitDto } from './dto/update-visit.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -36,7 +32,7 @@ export class VisitsService {
     });
   }
 
-  async create(createVisitDto: CreateVisitDto, userId: any) {
+  async create(createVisitDto: CreateVisitDto, userId: number) {
     const { visitorId, prisonerId, ...visitData } = createVisitDto;
 
     const visitorInfo = await this.prisma.db.visitor.findUnique({

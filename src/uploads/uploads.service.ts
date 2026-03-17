@@ -34,8 +34,8 @@ export class UploadsService {
         `${process.env.STORAGE_ENDPOINT}/${bucketName}`;
 
       return `${publicUrl}/${uniqueName}`;
-    } catch (error) {
-      console.error(error);
+    } catch (_error) {
+      console.error(_error);
       throw new InternalServerErrorException(
         'Erro ao enviar a imagem para o servidor',
       );

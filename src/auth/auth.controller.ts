@@ -11,6 +11,11 @@ import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { RefreshDto } from './dto/refresh.dto';
 
+interface JwtPayload {
+  sub: number;
+  email: string;
+}
+
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -28,7 +33,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async refreshToken(@Body() refreshDto: RefreshDto) {
     try {
-      const payload = await this.jwtService.verifyAsync(
+      const payload = await this.jwtService.verifyAsync<JwtPayload>(
         refreshDto.refresh_token,
         {
           secret: process.env.JWT_REFRESH_SECRET,
@@ -43,7 +48,7 @@ export class AuthController {
       return {
         access_token: newAccessToken,
       };
-    } catch (error) {
+    } catch (_error) {
       throw new UnauthorizedException('Refresh token inválido ou expirado');
     }
   }
