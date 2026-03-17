@@ -8,9 +8,21 @@ import { PrisonersModule } from './prisoners/prisoners.module';
 import { VisitsModule } from './visits/visits.module';
 import { VisitorsModule } from './visitors/visitors.module';
 import { UploadsModule } from './uploads/uploads.module';
+import { MovimentacoesModule } from './movimentacoes/movimentacoes.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
-  imports: [UsersModule, PrismaModule, AuthModule, PrisonersModule, VisitsModule, VisitorsModule, UploadsModule],
+  imports: [
+    ScheduleModule.forRoot(),
+    UsersModule,
+    PrismaModule,
+    AuthModule,
+    PrisonersModule,
+    VisitsModule,
+    VisitorsModule,
+    UploadsModule,
+    MovimentacoesModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

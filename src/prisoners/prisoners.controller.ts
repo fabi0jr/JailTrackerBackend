@@ -5,10 +5,12 @@ import { UpdatePrisonerDto } from './dto/update-prisoner.dto';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiConsumes, ApiBody} from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { SolitariaDto } from './dto/solitaria.dto';
 
 @Controller('prisoners')
 @UseGuards(AuthGuard('jwt'))
 @ApiBearerAuth()
+@ApiTags('Prisoners')
 export class PrisonersController {
   constructor(private readonly prisonersService: PrisonersService) {}
   
@@ -33,6 +35,12 @@ export class PrisonersController {
     return this.prisonersService.uploadProfileImage(id, file);
   }
 
+  @Get('ocupation-pavilhao')
+  @ApiOperation({ summary: 'Taxa de ocupação' })
+  ocupationRate() {
+    return this.prisonersService.ocupationRate()
+  }
+
   @Post()
   @ApiOperation({ summary: 'Cria um novo preso' })
   create(
@@ -51,6 +59,12 @@ export class PrisonersController {
     return this.prisonersService.findAll();
   }
 
+  @Get('solitaria')
+  @ApiOperation({ summary: 'Listar todos os presos em solitária' })
+  findAllSolitaria() {
+    return this.prisonersService.findAllSolitaria()
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Find One by ID' })
   findOne(@Param('id') id: string) {
@@ -59,13 +73,32 @@ export class PrisonersController {
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update prisioner data' })
-  update(@Param('id') id: string, @Body() updatePrisonerDto: UpdatePrisonerDto) {
-    return this.prisonersService.update(+id, updatePrisonerDto);
+  update(
+    @Param('id') id: string, 
+    @Body() updatePrisonerDto: UpdatePrisonerDto,
+    @Req() request: any
+  ) {
+    const userId = request.user.userId;
+    return this.prisonersService.update(+id, updatePrisonerDto, userId);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete prisioner' })
   remove(@Param('id') id: string) {
     return this.prisonersService.remove(+id);
+  }
+
+  @Post(':id/solitaria')
+  @ApiOperation({ summary: 'Enviar preso para solitária' })
+  enviarParaSolitaria(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() solitariaDto: SolitariaDto,
+    @Req() request: any,
+  ){
+    const userId = request.user.userId
+    const dataFimConvertida = new Date(solitariaDto.dataFim)
+
+    return this.prisonersService.enviarParaSolitaria(id, solitariaDto.motivo, dataFimConvertida, userId)
+
   }
 }

@@ -22,6 +22,7 @@ model User {
   telefone String
   endereco String
 
+  movimentacoes Movimentacao[]
   prisoners Prisoner[]
   visitors Visitor[]
   visits Visit[]
@@ -43,6 +44,11 @@ model Prisoner {
   cela String
 
   foto String?
+
+  naSolitaria Boolean @default(false)
+  dataFimSolitaria DateTime?
+
+  movimentacoes Movimentacao[]
 
   criadorId Int
   criador User @relation(fields: [criadorId], references: [id])
@@ -77,6 +83,8 @@ model Visit {
   horaEntrada String
   horaSaida String
 
+  status Boolean @default(false)
+
   visitorId Int
   visitor Visitor @relation(fields: [visitorId], references: [id])
 
@@ -88,4 +96,17 @@ model Visit {
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model Movimentacao {
+  id Int @id @default(autoincrement())
+  tipo String
+  descricao String
+  dataMovimentacao DateTime @default(now())
+
+  prisonerId Int
+  prisoner Prisoner @relation(fields: [prisonerId], references: [id])
+
+  criadorId Int
+  criador User @relation(fields: [criadorId], references: [id])
 }
