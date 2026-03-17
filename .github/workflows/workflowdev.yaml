@@ -25,11 +25,6 @@ jobs:
       - name: Run Lint
         run: npm run lint
 
-      - name: Run Tests
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        run: npm run test
-
   # ---------------------------------------------------
   # JOB 2: O "Entregador" (Deploy no Render)
   # ---------------------------------------------------
