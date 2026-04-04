@@ -20,7 +20,6 @@ import {
   ApiOperation,
   ApiBearerAuth,
   ApiConsumes,
-  ApiBody,
 } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
