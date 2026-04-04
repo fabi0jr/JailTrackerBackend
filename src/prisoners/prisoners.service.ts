@@ -15,7 +15,7 @@ export class PrisonersService {
     private readonly uploadsService: UploadsService,
   ) {}
 
-  async create(createPrisonerDto: CreatePrisonerDto, userId: number) {
+  async create(createPrisonerDto: CreatePrisonerDto, userId: number, file: Express.Multer.File) {
     const userExists = await this.prisma.db.prisoner.findUnique({
       where: { cpf: createPrisonerDto.cpf },
     });
@@ -23,10 +23,13 @@ export class PrisonersService {
       throw new ConflictException('Este CPF ja esta em uso');
     }
 
+    const imageUrl = await this.uploadsService.uploadFile(file);
+
     const newPrisoner = await this.prisma.db.prisoner.create({
       data: {
         ...createPrisonerDto,
         criadorId: userId,
+        foto: imageUrl,
       },
     });
 
@@ -103,25 +106,6 @@ export class PrisonersService {
       where: { id: id },
     });
     return { message: 'Preso deletado com sucesso!' };
-  }
-
-  async uploadProfileImage(id: number, file: Express.Multer.File) {
-    const prisonerExists = await this.prisma.db.prisoner.findUnique({
-      where: { id: id },
-    });
-
-    if (!prisonerExists) {
-      throw new NotFoundException('Preso não encontrado');
-    }
-
-    const imageUrl = await this.uploadsService.uploadFile(file);
-
-    const updatedPrisoner = await this.prisma.db.prisoner.update({
-      where: { id },
-      data: { foto: imageUrl },
-    });
-
-    return updatedPrisoner;
   }
 
   async enviarParaSolitaria(

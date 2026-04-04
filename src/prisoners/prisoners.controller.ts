@@ -42,26 +42,6 @@ interface AuthenticatedRequest extends Request {
 export class PrisonersController {
   constructor(private readonly prisonersService: PrisonersService) {}
 
-  @Post(':id/foto')
-  @ApiOperation({ summary: 'Fazer upload da foto do preso' })
-  @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        foto: { type: 'string', format: 'binary' },
-      },
-    },
-  })
-  @UseInterceptors(FileInterceptor('foto'))
-  uploadFoto(
-    @Param('id', ParseIntPipe) id: number,
-    @UploadedFile() file: Express.Multer.File,
-  ) {
-    if (!file) throw new BadRequestException('Nenhum arquivo enviado');
-    return this.prisonersService.uploadProfileImage(id, file);
-  }
-
   @Get('ocupation-pavilhao')
   @ApiOperation({ summary: 'Taxa de ocupação' })
   ocupationRate() {
@@ -70,13 +50,16 @@ export class PrisonersController {
 
   @Post()
   @ApiOperation({ summary: 'Cria um novo preso' })
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('file'))
   create(
     @Body() createPrisonerDto: CreatePrisonerDto,
     @Req() request: AuthenticatedRequest,
+    @UploadedFile() file: Express.Multer.File,
   ) {
     const userId = request.user.userId;
 
-    return this.prisonersService.create(createPrisonerDto, userId);
+    return this.prisonersService.create(createPrisonerDto, userId, file);
   }
 
   @Get()
