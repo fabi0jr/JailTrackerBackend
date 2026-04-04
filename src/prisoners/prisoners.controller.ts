@@ -11,7 +11,6 @@ import {
   UseInterceptors,
   ParseIntPipe,
   UploadedFile,
-  BadRequestException,
 } from '@nestjs/common';
 import { PrisonersService } from './prisoners.service';
 import { CreatePrisonerDto } from './dto/create-prisoner.dto';
@@ -58,7 +57,6 @@ export class PrisonersController {
     @UploadedFile() file: Express.Multer.File,
   ) {
     const userId = request.user.userId;
-
     return this.prisonersService.create(createPrisonerDto, userId, file);
   }
 
