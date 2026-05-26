@@ -15,7 +15,7 @@ export class PrisonersService {
     private readonly uploadsService: UploadsService,
   ) {}
 
-  async create(createPrisonerDto: CreatePrisonerDto, userId: number, file: Express.Multer.File) {
+  async create(createPrisonerDto: CreatePrisonerDto, userId: number, file?: Express.Multer.File) {
     const userExists = await this.prisma.db.prisoner.findUnique({
       where: { cpf: createPrisonerDto.cpf },
     });
@@ -23,7 +23,7 @@ export class PrisonersService {
       throw new ConflictException('Este CPF ja esta em uso');
     }
 
-    const imageUrl = await this.uploadsService.uploadFile(file);
+    const imageUrl = file ? await this.uploadsService.uploadFile(file) : null;
 
     const newPrisoner = await this.prisma.db.prisoner.create({
       data: {
