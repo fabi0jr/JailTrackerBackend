@@ -8,8 +8,6 @@ async function bootstrap() {
   app.enableCors({
     origin: [
       'http://localhost:5173',
-      'https://jail-tracker-frontend-dev.vercel.app',
-      'https://jail-tracker-frontend-test.vercel.app',
     ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,

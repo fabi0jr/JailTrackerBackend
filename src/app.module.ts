@@ -10,6 +10,7 @@ import { VisitorsModule } from './visitors/visitors.module';
 import { UploadsModule } from './uploads/uploads.module';
 import { MovimentacoesModule } from './movimentacoes/movimentacoes.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     VisitorsModule,
     UploadsModule,
     MovimentacoesModule,
+    DashboardModule,
   ],
   controllers: [AppController],
   providers: [AppService],
