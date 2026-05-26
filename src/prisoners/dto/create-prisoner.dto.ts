@@ -4,6 +4,15 @@ import { Transform, Type } from 'class-transformer';
 import { IsCPF } from 'class-validator-cpf';
 
 export class CreatePrisonerDto {
+
+  @ApiProperty({ 
+  description: 'Foto do preso',
+  type: 'string', 
+  format: 'binary',
+  required: false,
+})
+  file?: Express.Multer.File;
+
   @IsString()
   @IsNotEmpty()
   @ApiProperty({ example: 'Fabio Junior' })
